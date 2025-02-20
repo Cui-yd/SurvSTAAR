@@ -1,0 +1,30 @@
+Package: SurvSTAAR
+Type: Package
+Title: SurvSTAAR for Analyzing Whole-Genome/Whole-Exome Sequencing Data in Time-to-Event Studies
+Version: 0.1.0
+Author: Yidan Cui
+Maintainer: Yidan Cui <amber_cui@sjtu.edu.com>
+Description: An R package for performing SurvSTAAR in analyzing whole-genome/whole-exome sequencing data in time-to-event studies.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 4.0.0)
+Copyright: See COPYRIGHTS for details.
+Imports: 
+    survival,
+    seqminer,
+    SeqArray,
+    SeqVarTools,
+    TxDb.Hsapiens.UCSC.hg38.knownGene,
+    Matrix,
+    methods,
+    gdsfmt,
+    stats,
+    data.table,
+    CompQuadForm,
+    dplyr,
+    graphics
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 7.3.2
+Config/build/ignore: data-raw
