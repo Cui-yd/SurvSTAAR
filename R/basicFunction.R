@@ -922,3 +922,225 @@ SurvSTAAR_O = function(Geno, objNull, annotation_rank = NULL, MAC = NULL,
 
   return(results)
 }
+
+
+SurvSTAAR_Manhattan = function(result_data, chr = "Chr", pos = "pos", name = "Gene",
+                               pval = c("pLoF", "pLoF+D", "Missense", "Disruptive Missense", "Synonymous"),
+                               pch = c(0, 1, 2, 3, 4), max_y,
+                               sugline = 5e-7, genoline = 5e-7, annotateP = NULL,
+                               col=c("gray30", "gray80"), legned_title = "Functional Categories") {
+
+  result_data = result_data[order(result_data[, chr], result_data[, pos]), ]
+
+  if (length(pval) == 1) {
+    result_data[, pval] = -log10(result_data[, pval])
+  }
+  if (length(pval) > 1) {
+    for (j in pval) {
+      result_data[, j] = -log10(result_data[, j])
+    }
+  }
+
+  result_data$index = rep.int(seq_along(unique(result_data[, chr])), times = tapply(result_data[, name],result_data[, chr],length))
+
+  lastbase = 0
+  ticks = NULL
+  result_data$pos_new = NULL
+  for (i in unique(result_data$index)) {
+    if (i==1) {
+      result_data[result_data$index == i, "pos_new"] = result_data[result_data$index == i, pos]
+    } else {
+      lastbase = lastbase + max(result_data[result_data$index == (i-1), pos])
+      result_data[result_data$index == i,pos] = result_data[result_data$index == i,pos]-min(result_data[result_data$index==i,pos]) +1
+      result_data[result_data$index == i,"pos_new"] = result_data[result_data$index == i,pos] + lastbase
+    }
+  }
+  ticks <-tapply(result_data$pos_new, result_data$index, quantile, probs=0.5)
+  xlabel = 'Chromosome'
+  labs <- unique(result_data[, chr])
+
+  xmax = ceiling(max(result_data$pos_new) * 1.01)
+  xmin = floor(max(result_data$pos_new) * -0.01)
+  col = rep_len(col, max(result_data$index))
+
+
+  ### begin plotting
+  if (is.null(max_y)) {
+    def_args <- list(xaxt='n', bty='o', xaxs='i', yaxs='i', las=1, pch=20,
+                     cex.axis=1.5, cex.lab=1.5, cex=1.5,
+                     xlim=c(xmin,xmax), ylim=c(0, ceiling(max(result_data[, pval], na.rm = T))),
+                     xlab=xlabel, ylab=expression(-log[10](italic(p))))
+  } else {
+    def_args <- list(xaxt='n', bty='o', xaxs='i', yaxs='i', las=1, pch=20,
+                     cex.axis=1.5, cex.lab=1.5, cex=1.5,
+                     xlim=c(xmin,xmax), ylim=c(0,max_y),
+                     xlab=xlabel, ylab=expression(-log[10](italic(p))))
+  }
+  par(mar = c(5, 4, 6, 2) + 1.5)
+  do.call("plot", c(NA, def_args))
+  axis(1, at=ticks, labels=labs, tck = 0, cex.axis = 1.5)
+
+  if (length(pval) == 1) {
+
+    icol=1
+    for (i in unique(result_data$index)) {
+      points(result_data[result_data$index==i,"pos_new"], result_data[result_data$index==i,pval], col=col[icol], pch=20,)
+      icol=icol+1
+    }
+
+  } else if (length(pval) > 1) {
+
+    for (j in 1:length(pval)) {
+      pch_j = pch[j]
+      icol=1
+      for (i in unique(result_data$index)) {
+        points(result_data[result_data$index==i,"pos_new"], result_data[result_data$index==i,pval[j]], col=col[icol], pch=pch_j)
+        icol=icol+1
+      }
+    }
+
+  }
+
+
+  sugline = -log10(sugline)
+  genoline = -log10(genoline)
+  # Add suggestive and genomewide lines
+  usr <- par("usr")
+  clip(usr[1], usr[2], usr[3], usr[4])
+  if (sugline) abline(h=(sugline), col="blue", lwd = 2)
+  if (genoline) abline(h=genoline, col="red", lwd = 2)
+
+
+  # Highlight top SNPs
+
+  if (!is.null(annotateP)) {
+    annotateP = -log10(annotateP)
+
+    if (length(pval) == 1) {
+
+      topHits = result_data[which(result_data[, pval] >= annotateP), ]
+      par(xpd = TRUE)
+      if (nrow(topHits) != 0) {
+        with(topHits, textxy(pos_new, topHits[, pval], offset = 0.625,
+                             labs = topHits[, name], cex = 1.2))
+      }
+
+    } else if (length(pval) > 1) {
+
+      for (j in pval) {
+        topHits = result_data[which(result_data[, j] >= annotateP), ]
+        par(xpd = TRUE)
+        if (nrow(topHits) != 0) {
+          with(topHits, textxy(pos_new, topHits[, j], offset = 0.625,
+                               labs = topHits[, name], cex = 1.2))
+        }
+      }
+    }
+  }
+
+
+  ### add legend
+  if (length(pval) <= 5) {
+    legend("top", legend = pval, pch = pch, title = legned_title, bty = "n",
+           text.font = 1, cex = 1.4, ncol = length(pval), xpd = TRUE, inset = -0.2)
+  } else if (length(pval) > 5) {
+    temp_len = floor(length(pval)/2)
+    legend("top", legend = pval[1:temp_len], pch = pch[1:temp_len], title = legned_title, bty = "n",
+           text.font = 1, cex = 1.4, ncol = temp_len, xpd = TRUE, inset = -0.2)
+    legend("top", legend = pval[(temp_len+1):length(pval)], pch = pch[(temp_len+1):length(pval)], bty = "n",
+           text.font = 1, cex = 1.4, ncol = (length(pval)-temp_len), xpd = TRUE, inset = -0.1)
+  }
+  par(xpd = FALSE)
+}
+
+
+
+
+
+
+SurvSTAAR_QQplot = function(pval_result, main = NULL, pch = NULL, max_x = NULL, max_y = NULL,
+                            legend_lable = c("pLoF", "pLoF+D", "Missense", "Disruptive Missense", "Synonymous"),
+                            legned_title = "Functional Categories") {
+
+  if (inherits(pval_result, "numeric")) {
+
+    pval_result = sort(pval_result)
+    if (is.null(max_y)) {
+      max_y = ceiling(-log10(min(pval_result, na.rm = T)))
+    }
+    if (is.null(main)) {
+      if (is.null(max_x)) {
+        plot(-log10(ppoints(pval_result)), -log10(pval_result), pch = 20, cex = 0.5, col="grey40",
+             xlab = expression(Expected~~-log[10](p)), ylab = expression(Observed~~-log[10](p)),
+             ylim = c(0, max_y), cex.lab = 1.3, cex.axis = 1.3)
+      } else {
+        plot(-log10(ppoints(pval_result)), -log10(pval_result), pch = 20, cex = 0.5, col="grey40",
+             xlab = expression(Expected~~-log[10](p)), ylab = expression(Observed~~-log[10](p)),
+             ylim = c(0, max_y), cex.lab = 1.3, cex.axis = 1.3, xlim = c(0, max_x))
+      }
+    } else {
+      if (is.null(max_x)) {
+        plot(-log10(ppoints(pval_result)), -log10(pval_result), pch = 20, cex = 0.5, col="grey40",
+             xlab = expression(Expected~~-log[10](p)), ylab = expression(Observed~~-log[10](p)),
+             ylim = c(0, max_y), cex.lab = 1.3, cex.axis = 1.3, main = main)
+      } else {
+        plot(-log10(ppoints(pval_result)), -log10(pval_result), pch = 20, cex = 0.5, col="grey40",
+             xlab = expression(Expected~~-log[10](p)), ylab = expression(Observed~~-log[10](p)),
+             ylim = c(0, max_y), cex.lab = 1.3, cex.axis = 1.3, xlim = c(0, max_x), main = main)
+      }
+    }
+    abline(a = 0, b = 1, lty = "longdash", lwd = 1.5)
+
+  } else if (inherits(pval_result, c("data.frame", "matrix"))) {
+
+    if (is.null(max_y)) {
+      max_y = ceiling(-log10(min(pval_result, na.rm = T)))
+    }
+    par(mar = c(5, 4, 2, 2) + 1)
+    if (is.null(pch)) pch = c(0:(ncol(pval_result)-1))
+
+    for (j in 1:ncol(pval_result)) {
+
+      pval_result_temp = pval_result[, j]
+      pval_result_temp = sort(pval_result_temp)
+
+      if (j == 1) {
+        if (is.null(main)) {
+          if (is.null(max_x)) {
+            plot(-log10(ppoints(pval_result_temp)), -log10(pval_result_temp), pch = pch[j], cex = 0.5, col="grey40",
+                 xlab = expression(Expected~~-log[10](p)), ylab = expression(Observed~~-log[10](p)),
+                 ylim = c(0, max_y), cex.lab = 1.3, cex.axis = 1.3)
+          } else {
+            plot(-log10(ppoints(pval_result_temp)), -log10(pval_result_temp), pch = pch[j], cex = 0.5, col="grey40",
+                 xlab = expression(Expected~~-log[10](p)), ylab = expression(Observed~~-log[10](p)),
+                 ylim = c(0, max_y), xlim = c(0, max_x), cex.lab = 1.3, cex.axis = 1.3)
+          }
+        } else {
+          if (is.null(max_x)) {
+            plot(-log10(ppoints(pval_result_temp)), -log10(pval_result_temp), pch = pch[j], cex = 0.5, col="grey40",
+                 xlab = expression(Expected~~-log[10](p)), ylab = expression(Observed~~-log[10](p)),
+                 ylim = c(0, max_y), cex.lab = 1.3, cex.axis = 1.3, main = main)
+          } else {
+            plot(-log10(ppoints(pval_result_temp)), -log10(pval_result_temp), pch = pch[j], cex = 0.5, col="grey40",
+                 xlab = expression(Expected~~-log[10](p)), ylab = expression(Observed~~-log[10](p)),
+                 ylim = c(0, max_y), xlim = c(0, max_x), cex.lab = 1.3, cex.axis = 1.3, main = main)
+          }
+        }
+      } else {
+        points(-log10(ppoints(pval_result_temp)), -log10(pval_result_temp), pch = pch[j], cex = 0.5, col="grey40")
+      }
+
+    }
+    abline(a = 0, b = 1, lty = "longdash", lwd = 1.5)
+    if (is.null(legned_title) | isFALSE(legned_title)){
+      legend(x = "topleft", legend = legend_lable, pch = pch, # bty = "n",
+             text.font = 2, cex = 1.3, ncol = 1, xpd = TRUE)
+    } else {
+      legend(x = "topleft", legend = legend_lable, pch = pch, title = legned_title, # bty = "n",
+             text.font = 2, cex = 1.3, ncol = 1, xpd = TRUE)
+    }
+
+  }
+}
+
+

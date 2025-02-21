@@ -6,6 +6,8 @@
 \usage{
 IndividualTestPlink(
   objNull,
+  start_loc = NULL,
+  end_loc = NULL,
   genofile,
   chr,
   sampleCol,
@@ -22,6 +24,12 @@ IndividualTestPlink(
 }
 \arguments{
 \item{objNull}{an object from null model, which is the output of \code{nullModel}.}
+
+\item{start_loc}{starting location (position) of the genetic region for each
+individual variant to be analyzed using score test (default = NULL).}
+
+\item{end_loc}{ending location (position) of the genetic region for each
+individual variant to be analyzed using score test (default = NULL).}
 
 \item{genofile}{a character string specifying the file name of the genotype file.}
 

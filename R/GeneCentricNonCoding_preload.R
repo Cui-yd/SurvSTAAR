@@ -80,6 +80,7 @@
 #' \code{SurvSTAAR_O_all} is the p-values of the functional categories from the SurvSTAAR-O test.
 #' Other data frames are the detailed results for each functional category.
 #'
+#' @export
 #'
 GeneCentricNonCoding_preload = function(gene_name, genofile, objNull, variant_type=c("SNV","Indel","variant"), genes_info,
                                         categories = c("all","downstream","upstream","UTR","promoter_CAGE","promoter_DHS","enhancer_CAGE","enhancer_DHS"),

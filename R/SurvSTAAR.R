@@ -31,6 +31,12 @@
 #' @param verbose a logical value indicating whether to provides additional detailed
 #' information or messages during the execution of this function (default = FALSE).
 #'
+#' @import Matrix
+#' @import SeqArray
+#' @import methods
+#' @import CompQuadForm
+#' @import TxDb.Hsapiens.UCSC.hg38.knownGene
+#'
 #' @returns A list containing the set-based test results from \code{SurvSTAAR.}
 #' \code{num_variant} is the number of rare variants in this analyzed set.
 #' \code{MAF} is minor allele frequency.

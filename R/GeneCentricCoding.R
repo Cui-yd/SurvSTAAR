@@ -63,6 +63,7 @@
 #' \code{SurvSTAAR_O_all} is the p-values of the functional categories from the SurvSTAAR-O test.
 #' Other data frames are the detailed results for each functional category.
 #'
+#' @export
 #'
 GeneCentricCoding = function(gene_name, genofile, objNull, genes_info, variant_type = NULL,
                              categories = c("all", "all_ptv", "plof", "plof_ds", "ptv", "ptv_ds", "synonymous", "missense", "dmissense"),

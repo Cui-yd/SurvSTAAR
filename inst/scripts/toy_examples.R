@@ -1,3 +1,12 @@
+library(data.table)
+library(survival)
+library(seqminer)
+library(gdsfmt)
+library(SeqArray)
+library(SeqVarTools)
+library(Matrix)
+library(stats)
+library(CompQuadForm)
 library(SurvSTAAR)
 
 ### The genotype datas are generated using using the calibration coalescent model
@@ -18,7 +27,8 @@ library(SurvSTAAR)
 pheno_dat = fread("inst/extdata/pheno.txt", data.table = FALSE)
 
 ## use polygenic effects
-objNull = NullModel(phenofile = pheno_dat, LOCO = TRUE, chr = 1,
+## declare: we set LOCO = FALSE here, for the toy data only contains one chromosome
+objNull = NullModel(phenofile = pheno_dat, LOCO = FALSE, chr = 1,
                     statusCol = "status", timeCol = "time", sampleCol = "IID",
                     covCol = c("sex", "age"), PRSCol = "PE",
                     use_SPA = TRUE, verbose = TRUE)
@@ -34,7 +44,17 @@ objNull = NullModel(phenofile = pheno_dat, LOCO = FALSE, chr = 1,
 
 ### use plink format file ######
 
+# Apply individual analysis to all the single variants in the plink file
+# when there are not too many variants
 individual_plink = IndividualTestPlink(objNull, genofile = "inst/extdata/toy", chr = 1, sampleCol = "IID",
+                                       use_SPA = TRUE, SPA_filter = TRUE, SPA_filter_cutoff = 0.05,
+                                       geno_missing_cutoff = 1, geno_missing_imputation = "mean",
+                                       min_mac_cutoff = 20, min_maf_cutoff = 0.01,
+                                       chunk_size = 1000, verbose = TRUE)
+
+# Apply individual analysis to the selected single variants in the plink file
+individual_plink = IndividualTestPlink(objNull, start_loc = 1, end_loc = 3e5, genofile = "inst/extdata/toy",
+                                       chr = 1, sampleCol = "IID",
                                        use_SPA = TRUE, SPA_filter = TRUE, SPA_filter_cutoff = 0.05,
                                        geno_missing_cutoff = 1, geno_missing_imputation = "mean",
                                        min_mac_cutoff = 20, min_maf_cutoff = 0.01,

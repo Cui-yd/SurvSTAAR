@@ -59,6 +59,7 @@
 #' \code{SurvSTAAR_O} is the p-value of ncRNA functional category from the SurvSTAAR-O test.
 #' Other data frames are the detailed results for each functional category.
 #'
+#' @export
 #'
 ncRNA <- function(gene_name, chr, genofile, objNull, variant_type = NULL,
                   rare_maf_cutoff = 0.01, rare_num_cutoff = 2,

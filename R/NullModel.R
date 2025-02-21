@@ -34,8 +34,13 @@
 #' @param verbose a logical value indicating whether to provides additional detailed
 #' information or messages during the execution of this function (default = FALSE).
 #'
+#' @import survival
+#' @import data.table
+#' @import Matrix
+#'
 #' @returns A list containing the model fit from \code{\link{coxph}}.
 #' If \code{use_SPA = TRUE}, the list will also include the empirical CGF.
+#'
 #' @export
 
 NullModel = function(genofile = NULL, phenofile, LOCO = TRUE, chr = NULL,

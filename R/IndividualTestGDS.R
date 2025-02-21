@@ -37,6 +37,11 @@
 #' @param verbose a logical value indicating whether to provides additional detailed
 #' information or messages during the execution of this function (default = FALSE).
 #'
+#' @import Matrix
+#' @import SeqArray
+#' @importFrom dplyr left_join
+#' @importFrom SeqVarTools isSNV
+#'
 #' @returns A data frame containing the score test results and the estimated effect
 #' size of the minor allele for each individual variant in the specified genotype file.
 #' The columns include: CHR (chromosome), MarkerID (rsID), POS (position),

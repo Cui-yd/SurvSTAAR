@@ -3,6 +3,8 @@
 
 ## usethis namespace: start
 #' @importFrom dplyr left_join
+#' @importFrom GenomicFeatures genes
+#' @importFrom GenomicFeatures promoters
 #' @importFrom graphics abline
 #' @importFrom graphics axis
 #' @importFrom graphics clip

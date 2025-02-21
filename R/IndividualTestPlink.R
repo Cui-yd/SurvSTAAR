@@ -5,6 +5,10 @@
 #' the exact score test.
 #'
 #' @param objNull an object from null model, which is the output of \code{nullModel}.
+#' @param start_loc starting location (position) of the genetic region for each
+#' individual variant to be analyzed using score test (default = NULL).
+#' @param end_loc ending location (position) of the genetic region for each
+#' individual variant to be analyzed using score test (default = NULL).
 #' @param genofile a character string specifying the file name of the genotype file.
 #' @param chr a numeric value representing the chromosome.
 #' @param sampleCol a character string specifying the column name of sample IDs.
@@ -30,6 +34,11 @@
 #' @param verbose a logical value indicating whether to provides additional detailed
 #' information or messages during the execution of this function (default = FALSE).
 #'
+#' @import Matrix
+#' @import data.table
+#' @import seqminer
+#' @import methods
+#'
 #' @returns A data frame containing the score test results and the estimated effect
 #' size of the minor allele for each individual variant in the specified genotype file.
 #' The columns include: CHR (chromosome), MarkerID (rsID), POS (position),
@@ -43,7 +52,7 @@
 #'
 #' @export
 
-IndividualTestPlink = function(objNull, genofile, chr, sampleCol,
+IndividualTestPlink = function(objNull, start_loc = NULL, end_loc = NULL, genofile, chr, sampleCol,
                                use_SPA = NULL, SPA_filter = TRUE, SPA_filter_cutoff = 0.05,
                                geno_missing_cutoff = 1, geno_missing_imputation = c("mean", "minor"),
                                min_mac_cutoff = NULL, min_maf_cutoff = 0.01,
@@ -69,10 +78,22 @@ IndividualTestPlink = function(objNull, genofile, chr, sampleCol,
 
   N = length(sampleIndex)
 
-  if (length(unique(bim_data[,1])) > 1) {
-    M = length(which(bim_data[,1] == chr))
+  if (is.null(start_loc) & is.null(end_loc)) {
+    if (length(unique(bim_data[,1])) > 1) {
+      chr_index = which(bim_data[,1] == chr)
+      M = length(chr_index)
+    } else {
+      M = nrow(bim_data)
+    }
   } else {
-    M = nrow(bim_data)
+    if (length(unique(bim_data[,1])) > 1) {
+      chr_index = which(bim_data[,1] == chr)
+      bim_data_chr = bim_data[chr_index,]
+      chr_index = chr_index[which(bim_data_chr[,4] >= start_loc & bim_data_chr[,4] <= end_loc)]
+      M = length(chr_index)
+    } else {
+      M = length(which(bim_data[,4] >= start_loc & bim_data[,4] <= end_loc))
+    }
   }
 
   N_chunk = ceiling(M / chunk_size)
@@ -85,9 +106,8 @@ IndividualTestPlink = function(objNull, genofile, chr, sampleCol,
 
   for (chunk_i in 1:N_chunk) {
 
-    if (length(unique(bim_data[,1])) > 1) {
-      chr_index = which(bim_data[,1] == chr)
 
+    if (length(unique(bim_data[,1])) > 1) {
       if (chunk_i == N_chunk) {
         markerIndex = chr_index[((N_chunk-1) * chunk_size + 1): M]
       } else {
