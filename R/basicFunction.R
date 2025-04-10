@@ -356,10 +356,57 @@ genoFlip = function(Geno) {
 }
 
 
+#' @export
 rap_load_as = function(file, name) {
   # file <- basename(file)
   data_list <- load(file)
   assign(name, get(data_list[1]), envir = .GlobalEnv)
+}
+
+
+#' @export
+argsReshape = function(default_args, args, num_args, log_args) {
+
+  args_list = default_args
+
+  for (arg in args) {
+
+    key_value <- strsplit(arg, "=")[[1]]
+
+    if (length(key_value) == 2) {
+      arg_name = sub("--", "", key_value[1])
+
+      if (arg_name %in% names(default_args)) {
+
+        if (arg_name %in% num_args) {
+
+          value <- suppressWarnings(as.numeric(key_value[2]))
+          if (is.numeric(value)) {
+            args_list[[arg_name]] <- value
+          } else {
+            warning(paste("Invalid value: ", arg_name, ". A numeric value is required."))
+          }
+
+        } else if (arg_name %in% log_args) {
+
+          value <- suppressWarnings(as.logical(key_value[2]))
+          if (is.logical(value)) {
+            args_list[[arg_name]] <- value
+          } else {
+            warning(paste("Invalid value: ", arg_name, ". A logical value is required."))
+          }
+
+        } else {
+          value <- key_value[2]
+          args_list[[arg_name]] <- value
+        }
+
+      } else {
+        warning(paste("Unknown argument: ", arg_name))
+      }
+    }
+  }
+  return(args_list)
 }
 
 
