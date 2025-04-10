@@ -1,7 +1,7 @@
 Package: SurvSTAAR
 Type: Package
 Title: SurvSTAAR for Analyzing Whole-Genome/Whole-Exome Sequencing Data in Time-to-Event Studies
-Version: 0.1.0
+Version: 0.1.1
 Author: Yidan Cui
 Maintainer: Yidan Cui <amber_cui@sjtu.edu.com>
 Description: An R package for performing SurvSTAAR in analyzing whole-genome/whole-exome sequencing data in time-to-event studies.
