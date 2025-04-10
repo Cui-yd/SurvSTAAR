@@ -23,20 +23,31 @@ SurvSTAAR imports R packages
 <a href="https://cran.r-project.org/web/packages/survival/index.html">survival</a>,
 <a href="https://cran.r-project.org/web/packages/Matrix/index.html">Matrix</a>, 
 <a href="https://cran.r-project.org/web/packages/data.table/index.html">data.table</a>,
-and <a href="https://cran.r-project.org/web/packages/CompQuadForm/index.html">CompQuadForm</a>.
+<a href="https://cran.r-project.org/web/packages/CompQuadForm/index.html">CompQuadForm</a>,
+<a href="https://cran.r-project.org/web/packages/seqminer/index.html">seqminer</a>,
+<a href="https://cran.r-project.org/web/packages/dplyr/index.html">dplyr</a>,
+<a href="https://bioconductor.org/packages/release/bioc/html/SeqArray.html">SeqArray</a>,
+<a href="https://bioconductor.org/packages/release/bioc/html/SeqVarTools.html">SeqVarTools</a>,
+<a href="https://bioconductor.org/packages/release/bioc/html/GenomicFeatures.html">GenomicFeatures</a>,
+and <a href="https://bioconductor.org/packages/release/data/annotation/html/TxDb.Hsapiens.UCSC.hg38.knownGene.html">TxDb.Hsapiens.UCSC.hg38.knownGene</a>.
 These dependencies should be installed before installing SurvSTAAR.
 
 
 ## Installation
 ```
-library(devtools)
-devtools::install_github("Cui-yd/SurvSTAAR")
+install.packages(c("survival", "Matrix", "data.table", "CompQuadForm", "seqminer", "dplyr"))
+
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install(c("SeqArray", "SeqVarTools", "GenomicFeatures", "TxDb.Hsapiens.UCSC.hg38.knownGene"))
+
+devtools::install_github("Cui-yd/SurvSTAAR", ref = "main")
 ```
 
 ## Usage
 Please see the <a href="SurvSTAAR/inst/scripts/toy_examples.R"> SurvSTAAR examples </a> using a toy data for example analyses of sequencing data using the SurvSTAAR procedure. 
-Please see the <a href="https://github.com/Cui-yd/SurvSTAARpipeline">**SurvSTAARpipeline** </a> for scripts to analyze sequencing data using SurvSTAAR on a 
-High Performance Cluster or the UK Biobank Research Analysis Platform.
+Please see the <a href="https://github.com/Cui-yd/SurvSTAARpipeline">**SurvSTAARpipeline** </a> for scripts to analyze sequencing data using SurvSTAAR on High Performance Cluster (HPC) or the UK Biobank Research Analysis Platform (UKB RAP).
 
 
 ## Data Availability
@@ -45,7 +56,7 @@ the [Functional Annotation of Variant - Online Resource (FAVOR)](https://favor.g
 
 
 ## Version
-The current version is 0.1.0 (February 20, 2025).
+The current version is 0.1.1 (April 10, 2025).
 
 
 ## License
