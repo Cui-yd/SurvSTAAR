@@ -30,6 +30,7 @@ SurvSTAAR imports R packages
 <a href="https://bioconductor.org/packages/release/bioc/html/SeqVarTools.html">SeqVarTools</a>,
 <a href="https://bioconductor.org/packages/release/bioc/html/GenomicFeatures.html">GenomicFeatures</a>,
 and <a href="https://bioconductor.org/packages/release/data/annotation/html/TxDb.Hsapiens.UCSC.hg38.knownGene.html">TxDb.Hsapiens.UCSC.hg38.knownGene</a>.
+
 These dependencies should be installed before installing SurvSTAAR.
 
 
@@ -41,6 +42,9 @@ if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
 BiocManager::install(c("SeqArray", "SeqVarTools", "GenomicFeatures", "TxDb.Hsapiens.UCSC.hg38.knownGene"))
+
+if (!require("devtools", quietly = TRUE))
+    install.packages("devtools")
 
 devtools::install_github("Cui-yd/SurvSTAAR", ref = "main")
 ```
