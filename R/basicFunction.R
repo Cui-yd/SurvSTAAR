@@ -971,6 +971,8 @@ SurvSTAAR_O = function(Geno, objNull, annotation_rank = NULL, MAC = NULL,
 }
 
 
+
+#' @export
 SurvSTAAR_Manhattan = function(result_data, chr = "Chr", pos = "pos", name = "Gene",
                                pval = c("pLoF", "pLoF+D", "Missense", "Disruptive Missense", "Synonymous"),
                                pch = c(0, 1, 2, 3, 4), max_y,
@@ -1104,7 +1106,7 @@ SurvSTAAR_Manhattan = function(result_data, chr = "Chr", pos = "pos", name = "Ge
 
 
 
-
+#' @export
 SurvSTAAR_QQplot = function(pval_result, main = NULL, pch = NULL, max_x = NULL, max_y = NULL,
                             legend_lable = c("pLoF", "pLoF+D", "Missense", "Disruptive Missense", "Synonymous"),
                             legned_title = "Functional Categories") {
