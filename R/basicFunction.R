@@ -73,16 +73,22 @@ exactScore = function(objNull = objNull, G_mat = G_mat, use_SPA = FALSE, SPA_fil
   Est_se = 1 / Uscore_se
 
   if (use_SPA) {
+
     pvalue_log10 = -log10(result$Pvalue_SPA)
+    result$pvalue_log10 = pvalue_log10
+    result = result[, c(4:6, 1:3)]
+    result$Est = Est
+    result$Est_se = Est_se
+
   } else {
+
     pvalue_log10 = -log10(result$Pvalue)
+    result$pvalue_log10 = pvalue_log10
+    result = result[, c(3:5, 1:3)]
+    result$Est = Est
+    result$Est_se = Est_se
+
   }
-
-
-  result$pvalue_log10 = pvalue_log10
-  result = result[, c(4:6, 1:3)]
-  result$Est = Est
-  result$Est_se = Est_se
 
   result = list("result" = result, "Score" = Score, "Covariance" = Var_mat)
 
