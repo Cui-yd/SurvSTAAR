@@ -76,7 +76,7 @@ SurvSTAAR = function(Geno, MAF = NULL, MAC = NULL, objNull, annotation_phred = N
 
     genotype = genoFlip(Geno = Geno)
     MAF = genotype$G_summary$MAF
-    MAC = floor(MAF * nrow(Geno) * 2)
+    MAC = MAF * nrow(Geno) * 2
 
     RV_label = as.vector((MAF < rare_maf_cutoff)&(MAF > 0))
     Geno = genotype$Geno[ ,RV_label]
@@ -141,11 +141,11 @@ SurvSTAAR = function(Geno, MAF = NULL, MAC = NULL, objNull, annotation_phred = N
                            use_SPA = use_SPA, SPA_filter = SPA_filter, SPA_filter_cutoff = SPA_filter_cutoff,
                            weight_A = w_A, weight_B = w_B, weight_S = w_S,
                            combine_ultra_rare, ultra_rare_mac_cutoff, verbose = verbose)
-
+    cMAC <- sum(Geno)
 
     return(c(pvalues,
              list(num_variant = sum(RV_label),
-                  MAC = MAC,
+                  cMAC = cMAC,
                   MAF = MAF)))
 
   }

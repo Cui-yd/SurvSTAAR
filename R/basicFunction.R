@@ -178,6 +178,9 @@ genoMatrixPlink = function(Geno, bim_data = bim_data, markerIndex,
   G_summary = cbind(bim_data[markerIndex[include_index], c(1,4:6,2)], G_summary)
   colnames(G_summary)[1:5] = c("CHR", "POS", "REF1", "REF2", "rsID")
 
+  ## update imputed MAC
+  G_summary$MAC = colSums(Geno)
+
   result = list(Geno = Geno, G_summary = G_summary)
 
   return(result)
@@ -249,6 +252,9 @@ genoMatrixGDS = function(Geno, G_info, geno_missing_cutoff = 1, geno_missing_imp
           }
   )
 
+  ## update imputed MAC
+  G_summary$MAC = colSums(Geno)
+
   result = list(Geno = Geno, G_summary = G_summary, include_index = include_index)
 
   return(result)
@@ -265,7 +271,7 @@ genoFlipRV = function(Geno, geno_missing_imputation = c("mean", "minor"),
   G_summary = list()
   G_na = list()
 
-  ## calculate MAF MAC missing and flip
+  ## calculate MAF, MAC, missing, and flip
   for (p in 1:Geno_col) {
     Geno_p = Geno[, p]
 
@@ -314,6 +320,8 @@ genoFlipRV = function(Geno, geno_missing_imputation = c("mean", "minor"),
           }
   )
 
+  ## update imputed MAC
+  G_summary$MAC = colSums(Geno)
 
   result = list(Geno = Geno, G_summary = G_summary, include_index = include_index)
 
@@ -354,6 +362,9 @@ genoFlip = function(Geno) {
     na_index = G_na[[p]]
     Geno[na_index, p] = 0
   }
+
+  ## update imputed MAC
+  G_summary$MAC = colSums(Geno)
 
   result = list(Geno = Geno, G_summary = G_summary)
 
@@ -904,7 +915,7 @@ SKAT = function(Geno, Score, Covariance, Pvalue, MAC = NULL, weight_S, weight_B,
 SurvSTAAR_O = function(Geno, objNull, annotation_rank = NULL, MAC = NULL,
                        use_SPA = NULL, SPA_filter = TRUE, SPA_filter_cutoff = 0.05,
                        weight_A, weight_B, weight_S,
-                       combine_ultra_rare = TRUE, ultra_rare_mac_cutoff = 60, verbose = FALSE) {
+                       combine_ultra_rare = TRUE, ultra_rare_mac_cutoff = 20, verbose = FALSE) {
 
   if (!inherits(Geno, "matrix") && !inherits(Geno, "Matrix")) stop("Genotype is not a matrix")
 
